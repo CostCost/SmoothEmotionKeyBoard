@@ -14,8 +14,10 @@
 
         <com.cpoopc.smoothemotionkeyboard.emotion.view.EmotionEditText
             android:id="@+id/edittext"
+            android:gravity="start"
+            android:background="@android:color/transparent"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_alignParentTop="true" />
 
     </RelativeLayout>
@@ -65,5 +67,7 @@
             android:layout_height="match_parent"
             android:background="#209280"
             android:visibility="gone" />
+
     </RelativeLayout>
+
 </LinearLayout>

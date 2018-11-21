@@ -1,6 +1,4 @@
-package com.cpoopc.smoothsoftinputlayout;/**
- * Created by Administrator on 2015-09-01.
- */
+package com.cpoopc.smoothsoftinputlayout;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -20,17 +18,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
-/**
- * User: cpoopc
- * Date: 2015-09-01
- * Time: 00:18
- */
 public abstract class BaseSoftInputLayout extends LinearLayout implements View.OnClickListener {
 
-    public final static int SHOW_KEYBOARD = 0X1;
-    public final static int SHOW_EMOTION = 0X10;
-    public final static int SHOW_OTHER = 0X11;
+    public final static int SHOW_KEYBOARD = 0x01;
+    public final static int SHOW_EMOTION = 0x10;
+    public final static int SHOW_OTHER = 0x11;
 
     private View rootView;
     private boolean mIsKeyboardShow;
@@ -50,49 +42,41 @@ public abstract class BaseSoftInputLayout extends LinearLayout implements View.O
     private int mLastCoverHeight;
     private int mLastHitBottom;
 
-    public static class ViewHolder{
-        private int SHOW_TYPE;
-        private View showView;
-
-        public ViewHolder(int SHOW_TYPE, View showView) {
-            this.SHOW_TYPE = SHOW_TYPE;
-            this.showView = showView;
-        }
-
-        public int getSHOW_TYPE() {
-            return SHOW_TYPE;
-        }
-
-        public View getShowView() {
-            return showView;
-        }
-    }
-
     public BaseSoftInputLayout(Context context) {
         super(context);
-        init();
+        init(context, null, -1, -1);
     }
 
     public BaseSoftInputLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init();
+        init(context, attrs, -1, -1);
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public BaseSoftInputLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
+        init(context, attrs, defStyleAttr, -1);
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public BaseSoftInputLayout(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        init();
+        init(context, attrs, defStyleAttr, defStyleRes);
     }
 
-    protected void init() {
+    /**
+     * 初始化
+     *
+     * @param ctx
+     * @param attrs
+     * @param defStyleAttr
+     * @param defStyleRes
+     */
+    protected void init(Context ctx, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         viewMapping = new HashMap<>();
         showViewList = new ArrayList<>();
+
+        // 交给子类的用来加载布局的方法
         inflateView();
         final Context context = getContext();
         if (context instanceof Activity) {
@@ -100,10 +84,14 @@ public abstract class BaseSoftInputLayout extends LinearLayout implements View.O
         } else {
             rootView = this;
         }
+
+        // 从子类中获取各个控件
         btnKeyBoard = getBtnKeyBoard();
         editText = getEditText();
         container = getContainer();
         frame = getFrame();
+
+        // 监听 ViewTree
         rootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
@@ -124,30 +112,22 @@ public abstract class BaseSoftInputLayout extends LinearLayout implements View.O
         });
     }
 
-    /**
-     * 渲染自定义布局
-     */
     protected abstract void inflateView();
-
     protected abstract View getContainer();
-
     protected abstract View getFrame();
-
     public abstract EditText getEditText();
-
-    /**
-     * @return 返回键盘按键,若无则返回null
-     */
     protected abstract View getBtnKeyBoard();
 
     /**
-     * 检测键盘弹出状态
+     * 检测键盘的弹出状态
      */
     private void detectKeyBoardState() {
         Rect visibleRect = new Rect();
         rootView.getWindowVisibleDisplayFrame(visibleRect);
+
         Rect hitRect = new Rect();
         rootView.getHitRect(hitRect);
+
         int coverHeight = hitRect.bottom - visibleRect.bottom;
         if (mLastCoverHeight == coverHeight && mLastHitBottom == hitRect.bottom) { // fix魅族动态显示/隐藏navigationbar没有及时响应
             return;
@@ -193,6 +173,7 @@ public abstract class BaseSoftInputLayout extends LinearLayout implements View.O
 
     /**
      * 刷新frame高度
+     *
      * @param bottom
      */
     private void refreshFrame(int bottom) {
@@ -218,7 +199,7 @@ public abstract class BaseSoftInputLayout extends LinearLayout implements View.O
     @Override
     public void onClick(View v) {
         if (v == btnKeyBoard) {
-            // 点击键盘
+            // 点击键盘的事件是专门处理的
             if (showWhat == SHOW_KEYBOARD) {
                 showWhat = 0;
                 hideSoftInput();
@@ -231,7 +212,7 @@ public abstract class BaseSoftInputLayout extends LinearLayout implements View.O
                 hideAllViewExceptKeyBoard();
                 showSoftInput();
             }
-        }else {
+        } else {
             ViewHolder viewHolder = viewMapping.get(v);
             if (viewHolder != null) {
                 int show_type = viewHolder.getSHOW_TYPE();
@@ -268,18 +249,15 @@ public abstract class BaseSoftInputLayout extends LinearLayout implements View.O
 
     private void hideSoftInput() {
         if(editText == null) return;
-        InputMethodManager imm = (InputMethodManager)getContext()
-                .getSystemService(Activity.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(editText.getWindowToken(),
-                InputMethodManager.HIDE_NOT_ALWAYS);
+        InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Activity.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(editText.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
     }
 
     private void showSoftInput() {
         if(editText == null) return;
         editText.requestFocus();
-        ((InputMethodManager) getContext()
-                .getSystemService(Context.INPUT_METHOD_SERVICE))
-                .showSoftInput(editText, 0);
+        InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Activity.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(editText, InputMethodManager.RESULT_UNCHANGED_SHOWN);
     }
 
     private void hideView(View view) {
@@ -313,9 +291,7 @@ public abstract class BaseSoftInputLayout extends LinearLayout implements View.O
             if (id > 0 ) {
                 navigationBarHeight = rs.getDimensionPixelSize(id);
             }
-        } catch (Exception e) {
-            // default 0
-        }
+        } catch (Exception e) { /* default 0 */ }
         return navigationBarHeight;
     }
 
@@ -328,4 +304,21 @@ public abstract class BaseSoftInputLayout extends LinearLayout implements View.O
         this.minOtherBoardHeight = minOtherBoardHeight;
     }
 
+    public static class ViewHolder {
+        private int SHOW_TYPE;
+        private View showView;
+
+        public ViewHolder(int SHOW_TYPE, View showView) {
+            this.SHOW_TYPE = SHOW_TYPE;
+            this.showView = showView;
+        }
+
+        public int getSHOW_TYPE() {
+            return SHOW_TYPE;
+        }
+
+        public View getShowView() {
+            return showView;
+        }
+    }
 }

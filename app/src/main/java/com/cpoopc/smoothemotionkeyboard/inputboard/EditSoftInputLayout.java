@@ -15,7 +15,6 @@ import com.cpoopc.smoothemotionkeyboard.emotion.data.HahaEmotion;
 import com.cpoopc.smoothemotionkeyboard.emotion.view.EmotionPager;
 import com.cpoopc.smoothsoftinputlayout.BaseSoftInputLayout;
 
-
 /**
  * User: cpoopc
  * Date: 2015-09-01
@@ -33,7 +32,9 @@ public class EditSoftInputLayout extends BaseSoftInputLayout {
 
     private View btnOther;
     private View otherView;
+
     private View frame;
+
     private EditText editText;
 
     public EditSoftInputLayout(Context context) {
@@ -56,32 +57,56 @@ public class EditSoftInputLayout extends BaseSoftInputLayout {
 
     @Override
     protected void inflateView() {
+        // 获取自定义的布局控件
         View layout = LayoutInflater.from(getContext()).inflate(R.layout.edit_softinput_layout, this, true);
         container = layout.findViewById(R.id.container);
         frame = layout.findViewById(R.id.frame);
-        editText = (EditText) layout.findViewById(R.id.edittext);
+        editText = layout.findViewById(R.id.edittext);
+
+        // 设置三个按钮对应的控件
         setupKeyboardView(layout);
         setupEmotionView(layout);
         setupOtherView(layout);
     }
 
+    /**
+     * 设置“键盘”相关的控件的逻辑
+     *
+     * @param layout
+     */
     private void setupKeyboardView(View layout) {
         btnKeyBoard = layout.findViewById(R.id.btnKeyBoard);
         btnKeyBoard.setOnClickListener(this);
     }
 
+    /**
+     * 设置“其他”按钮相关的逻辑
+     *
+     * @param layout
+     */
     private void setupOtherView(View layout) {
         btnOther = layout.findViewById(R.id.btnOther);
-        btnOther.setOnClickListener(this);
         otherView = layout.findViewById(R.id.otherView);
+
+        // 为控件添加单击事件监听，这个接口的实现在顶层的类中
+        btnOther.setOnClickListener(this);
+
+        // 将控件加入到待显示列表中
         add2ShowViewList(otherView);
+
+        // 加入控件加入到映射表中，主要是“按钮-控件类型-控件”的映射关系
         add2MappingMap(btnOther, SHOW_OTHER, otherView);
     }
 
+    /**
+     * 设置“表情”相关的逻辑，基本的逻辑与上面的方法相同
+     *
+     * @param layout
+     */
     private void setupEmotionView(View layout) {
         btnEmotion = layout.findViewById(R.id.btnEmotion);
         btnEmotion.setOnClickListener(this);
-        emotionView = (EmotionPager) layout.findViewById(R.id.emotionPager);
+        emotionView = layout.findViewById(R.id.emotionPager);
         emotionView.bindData(HahaEmotion.DATA);
         add2ShowViewList(emotionView);
         add2MappingMap(btnEmotion, SHOW_EMOTION, emotionView);// btnEmotion-(SHOW_EMOTION-emotionView)

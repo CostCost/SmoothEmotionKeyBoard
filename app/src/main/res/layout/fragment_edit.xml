@@ -8,6 +8,6 @@
         android:id="@+id/softinputLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
-    </com.cpoopc.smoothemotionkeyboard.inputboard.EditSoftInputLayout>
+        android:orientation="vertical"/>
+
 </RelativeLayout>
